@@ -1,0 +1,11 @@
+What we've built so far is a fairly simple, yet workable guestbook. Although you can post and read messages and also have bad words/HTML content stripped out, it still leaves a lot to be desired. If you are interested in expanding your guestbook, consider these ideas:
+
+Enable moderation of posts, where all posts need to be vetted by a moderator then approved. The easiest way to do this would be to have a field, IsVisible, set to 0 (invisible) for all new posts, then have it set to 1 (visible) when approved - you can simply filter for IsVisible = 1 in read.php
+
+Make it have multiple pages if the guestbook gets too long, e.g. "Messages 1-100", "Messages 101-200", "Messages 201 to 299", etc. The easy way to achieve this is to use the LIMIT clause in your SELECT query for read.php and store a variable like $start. For example: SELECT foo FROM bar ORDER BY DateSubmitted DESC LIMIT $start, 100;
+
+Have a preview message option that will show how the poster's entry would look if added to the database.
+
+Allow visitors to edit or delete their post. This might sound tricky, but really all you need to do is ask people to enter a password as part of the entry submission form - if they select to edit or delete an entry, they need to provide the matching password to proceed.
+
+Guestbooks are so often frowned upon by web veterans as being for newbies only, which is rubbish - there is so much you can do with a simple guestbook that it is a great place to sharpen your skills.
