@@ -1,52 +1,93 @@
 <?php
+    // VARS:
+    $unacceptable = array('fuck', 'ass', 'shit', 'asshole', 'jerk');
+    $pepper = 'guestbk';
+    $salt = '%';
 
-    $option = filter_input(INPUT_GET, 'op', FILTER_SANITIZE_STRING);
-    $entry_id = filter_input(INPUT_GET, 'entry', FILTER_SANITIZE_NUMBER_INT);
+    // Sanitize input
+    @$option = filter_input(INPUT_GET, 'op', FILTER_SANITIZE_STRING);
 
-    // Delete a comment
+    // PROCESS COMMENTS:
+    // Delete
     if ( isset($option) && $option=='del' && isset($entry_id) )
         {
         require "connect.php";
         $sql = "DELETE FROM guestbook WHERE id=$entry_id";
         if ( $dbh->exec($sql) )
             {
-            print "Your comment has been deleted.<br>Click <a href='read.php'>here</a> return to the guestbook.";
-            exit();
+            unset($dbh);
+            exit("Your comment has been deleted.<br>Click <a href='read.php'>here</a> return to the guestbook.");
             }
         }
 
-    // Insert new comment to guestbook
+    // Edited message but no password provided
+    if ( isset($_POST['GuestID']) && $_POST['GuestPass'] == '' )
+        {
+        exit("Please enter you password in order to edit the message. Try <a href='read.php'>again</a>.");
+        }
+
+    // Edit
+    if ( isset($_POST['GuestID']) && isset($_POST['GuestPass']) )
+        {
+        require "connect.php";
+
+        $GuestPass = addslashes(strip_tags(rtrim( $_POST['GuestPass'] . $salt . $pepper )));
+        $GuestID = intval($_POST['GuestID']);
+        $GuestMessage = addslashes(strip_tags(rtrim( $_POST['GuestMessage'] )));
+        $GuestMessage = str_ireplace($unacceptable, "***", $GuestMessage);  // Remove unacceptable words
+
+        // Verify password
+        if ( $stmt = $dbh->query("SELECT COUNT(id) FROM guestbook WHERE guest_pass = PASSWORD('$GuestPass')") )
+            {
+            if ( $stmt->fetchColumn() )
+                {   // update DB
+                $sql = "UPDATE guestbook
+                        SET guest_message = '$GuestMessage', date_submitted = CURRENT_TIMESTAMP
+                        WHERE id = $GuestID";
+
+                if ( $dbh->exec($sql) )
+                    {
+                    exit("Your comment has been successfully updated. <a href='read.php'>View</a> all guestbook messages.");
+                    }
+                else
+                    {
+                    exit("Something went wrong. Please try again.");
+                    }
+                }
+            else
+                {
+                exit("Invalid password. Try <a href='read.php'>again</a>.");
+                }
+            }
+         unset($_POST);
+         unset($dbh);
+        }
+
+    // New comment or Edit comment
     if ( !isset($option) && isset($_POST['GuestName']) && isset($_POST['GuestPass']) )
         {
         require "connect.php";
 
-        $unacceptable = array('fuu', 'ass', 'shii');
-        $salt = 'guestbk';
-
-        // Remove unacceptable words before submitting data to database
-        $GuestMessage = str_ireplace($unacceptable, "***", $_POST['GuestMessage']);
-
-        // Remove HTML tags and sanitize
         $GuestName = addslashes(strip_tags(rtrim( $_POST['GuestName'] )));
-        $GuestPass = addslashes(strip_tags(rtrim( $_POST['GuestPass'] . '%' . $salt )));
+        $GuestPass = addslashes(strip_tags(rtrim( $_POST['GuestPass'] . $salt . $pepper )));
         $GuestEmail = addslashes(strip_tags(rtrim( $_POST['GuestEmail'] )));
-        $GuestMessage = addslashes(strip_tags(rtrim( $GuestMessage )));
+        $GuestMessage = addslashes(strip_tags(rtrim( $_POST['GuestMessage'] )));
+        $GuestMessage = str_ireplace($unacceptable, "***", $GuestMessage);  // Remove unacceptable words
 
         $sql = "INSERT INTO guestbook (guest_name, guest_pass, guest_email, guest_message)
                 VALUES ('$GuestName', PASSWORD('$GuestPass') ,'$GuestEmail', '$GuestMessage')";
 
+        // Insert comment or bust
         if ( $stmt = $dbh->query($sql) )
             {
-            exit("Thanks for posting - click <a href='read.php'>here</a> to view the guestbook with your message added!");
+            exit("Thanks for leaving a comment. View the guestbook <a href='read.php'>here</a>.");
             }
         else
             {
-            echo "There was an error adding your entry - please try again, filling in all fields.";
+            echo "There was an error adding your entry. Please try again.";
             }
-
         unset($_POST);
         unset($dbh);
-        unset($query);
         }
 ?>
 
@@ -59,18 +100,19 @@
     <h2>Please leave a comment (be gentle!)</h2>
 
     <?php
+    @$entry_id = intval($_GET['entry']);
+
+    // Edit comment in guestbook
     if ( isset($option) && $option=='edit' && isset($entry_id) )
         {
         require "connect.php";
 
         if ( $stmt = $dbh->query("SELECT COUNT(*) FROM guestbook") )
             {
-            // TODO: revise and adapt SQL query for edited comments
-            $sql = "SELECT guest_name, guest_email, guest_message, date_submitted
+            $sql = "SELECT guest_name, guest_email, date_submitted
                     FROM guestbook
                     WHERE id=$entry_id";
 
-            // Show comment in form
             $stmt = $dbh->query($sql);
             $entry = $stmt->fetchAll();
             //echo '<pre>';
@@ -80,27 +122,31 @@
             print "
                 <p><strong>Previously submitted on $date_submitted</strong></p>
                 <form method='post' action='post.php'>
-                    Name: <input type='text' name='GuestName' disabled value='{$entry[0]['guest_name']}'><br>
-                    Email: <input type='text' name='GuestEmail' disabled value='{$entry[0]['guest_email']}'><br><br>
-                    Message:<br><textarea rows='10' cols='40' name='GuestMessage'>{$entry[0]['guest_message']}</textarea>
-                    <br><br>
-                    <input type='submit' value='post'>
-                </form>";
+                    <p>Name: {$entry[0]['guest_name']}</p>
+                    Password: <input type='password' name='GuestPass'><br>
+                    <p>Email: {$entry[0]['guest_email']}</p>
+                    Message:<br><textarea rows='10' cols='40' name='GuestMessage'></textarea>
+                    <br>
+                    <input type='hidden' name='GuestName' value='{$entry[0]['guest_name']}'>
+                    <input type='hidden' name='GuestEmail' value='{$entry[0]['guest_email']}'>
+                    <input type='hidden' name='GuestID' value='$entry_id'>
+                    <input type='submit' value='Post comment'>
+                </form><br>";
+            print "<br><a href='read.php'>Read comments</a>";
             }
         }
     else
+        // Post a new comment
         {
-        print "
-            <form method='post' action='post.php'>
+    ?>
+        <form method='post' action='post.php'>
             Name: <input type='text' name='GuestName'><br>
             Pass: <input type='password' name='GuestPass'><br>
             Email: <input type='text' name='GuestEmail'><br><br>
             Message:<br><textarea rows='10' cols='40' name='GuestMessage'></textarea>
             <br><br>
-            <input type='submit' value='post'>
-            </form>";
-        }
-    ?>
-
+            <input type='submit' value='Post comment'>
+        </form>
+    <?php } ?>
 </body>
 </html>

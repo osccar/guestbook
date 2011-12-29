@@ -1,4 +1,3 @@
-<?php require "connect.php"; ?>
 
 <!DOCTYPE html>
 <html>
@@ -10,6 +9,8 @@
     <hr>
 
     <?php
+    require "connect.php";
+
     if ( $stmt = $dbh->query("SELECT COUNT(*) FROM guestbook") )
         {
         print "<h5>Total entries in guestbook: ". $stmt->fetchColumn() ."</h5>";
