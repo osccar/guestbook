@@ -6,7 +6,7 @@
     <title>Guestbook entries</title>
 </head>
 <body>
-    <h2>List guestbook entries</h2>
+    <h2>Guestbook entries</h2>
     <hr>
 
     <?php
@@ -14,7 +14,7 @@
         {
         print "<h5>Total entries in guestbook: ". $stmt->fetchColumn() ."</h5>";
 
-        $sql = "SELECT guest_name, guest_email, guest_message, date_submitted
+        $sql = "SELECT id, guest_name, guest_email, guest_message, date_submitted
                 FROM guestbook
                 ORDER BY date_submitted DESC";
 
@@ -27,7 +27,11 @@
                 $entry["guest_name"],
                 $date_submitted
             );
-            print "<p><em>".wordwrap($entry["guest_message"], 85)."</em></p>";
+            print "<p><em>".wordwrap($entry["guest_message"])."</em></p>";
+            printf("%s | %s",
+                "<a href='post.php?op=edit&entry={$entry['id']}' title='Edit comment'>Edit</a>",
+                "<a href='post.php?op=del&entry={$entry['id']}' title='Delete comment'>Delete</a>"
+            );
             print "<p>-------------------------------------------------------------------------------</p>";
             }
 
