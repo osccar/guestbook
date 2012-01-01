@@ -4,10 +4,22 @@
     $pepper = 'guestbk';
     $salt = '%';
 
-    // Sanitize input
-    @$option = filter_input(INPUT_GET, 'op', FILTER_SANITIZE_STRING);
+    // Check and sanitize input vars
+    if ( filter_has_var(INPUT_GET, 'op') )
+        {
+        @$option = filter_input( INPUT_GET, 'op', FILTER_SANITIZE_STRING );
+        }
+    if ( filter_has_var(INPUT_GET, 'entry') )
+        {
+        @$entry_id = filter_input( INPUT_GET, 'entry', FILTER_SANITIZE_INT );
+        }
+    if ( filter_has_var(INPUT_POST, 'GuestID') )
+        {
+        @$GuestID = filter_input( INPUT_POST, 'GuestID', FILTER_SANITIZE_INT );
+        }
 
-    // PROCESS COMMENTS:
+    // PROCESS COMMENTS
+
     // Delete
     if ( isset($option) && $option=='del' && isset($entry_id) )
         {
@@ -21,18 +33,18 @@
         }
 
     // Edited message but no password provided
-    if ( isset($_POST['GuestID']) && $_POST['GuestPass'] == '' )
+    if ( isset($GuestID) && $_POST['GuestPass'] == '' )
         {
         exit("Please enter you password in order to edit the message. Try <a href='read.php'>again</a>.");
         }
 
     // Edit
-    if ( isset($_POST['GuestID']) && isset($_POST['GuestPass']) )
+    if ( isset($GuestID) && isset($_POST['GuestPass']) )
         {
         require "connect.php";
 
         $GuestPass = addslashes(strip_tags(rtrim( $_POST['GuestPass'] . $salt . $pepper )));
-        $GuestID = intval($_POST['GuestID']);
+
         $GuestMessage = addslashes(strip_tags(rtrim( $_POST['GuestMessage'] )));
         $GuestMessage = str_ireplace($unacceptable, "***", $GuestMessage);  // Remove unacceptable words
 
@@ -100,8 +112,6 @@
     <h2>Please leave a comment (be gentle!)</h2>
 
     <?php
-    @$entry_id = intval($_GET['entry']);
-
     // Edit comment in guestbook
     if ( isset($option) && $option=='edit' && isset($entry_id) )
         {
@@ -111,7 +121,7 @@
             {
             $sql = "SELECT guest_name, guest_email, date_submitted
                     FROM guestbook
-                    WHERE id=$entry_id";
+                    WHERE id = $entry_id";
 
             $stmt = $dbh->query($sql);
             $entry = $stmt->fetchAll();
