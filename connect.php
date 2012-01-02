@@ -10,8 +10,9 @@
         $dbh = new PDO($DSN_MYSQL, $dbuser, $dbpass);
         //$dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
+        }
+    catch ( PDOException $e )
+        {
         $dbh = null;
-        print "Connection failed! ". $e->getMessage() ."<br />";
-        exit();
-    }
+        exit("Connection failed! ". $e->getMessage() ."<br />");
+        }
