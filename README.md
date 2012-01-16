@@ -5,7 +5,7 @@
 
 ---
 
-## Design:
+## Design
     The whole project is using HTML5 as markup. It also uses CSS3 elements here and there.
 
     **NOTE**
@@ -14,6 +14,7 @@
 ## Core
 
     - PHP 5.3
+    - HTML5
     - CSS 2 and 3
 
 ## Extra functionality
