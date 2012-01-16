@@ -181,7 +181,7 @@
                         <p><input required type=password name=GuestPass placeholder='Initial password'></p>
                         <p>Email</p>
                         <p><input disabled type=email name=GuestEmail value={$entry[0]['guest_email']}></p>
-                        <p>Comment (150 characters max.)</p>
+                        <p>Comment (250 characters max.)</p>
                         <p>
                             <textarea autofocus=true rows=10 cols=60 name=GuestMessage>{$entry[0]['guest_message']}</textarea>
                         </p>
@@ -224,7 +224,7 @@
                 <p><input required type=password name=GuestPass placeholder='Make it good!'></p>
                 <p>Email</p>
                 <p><input required type=email name=GuestEmail placeholder=name@domain.com></p>
-                <p>Comment (150 characters max.)</p>
+                <p>Comment (250 characters max.)</p>
                 <p><textarea autofocus=true rows=10 cols=60 name=GuestMessage></textarea></p>
                 <br>
                 <input type=submit class='button medium cyan' value='So let it be written!'>
