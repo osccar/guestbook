@@ -6,17 +6,25 @@
 ---
 
 ## Design
-    The whole project is using HTML5 as markup. It also uses CSS3 elements here and there.
+
+    The whole application is done with HTML5 and CSS3
 
     **NOTE**
     Visual aesthetics was not the priority here, so feel free to redesign for your personal pleasure!
 
 ## Core
 
+    I decided to make this application just using server side language and keep it as clean and simple as possible without getting javascript in the mix.
+
     - PHP 5.3
     - HTML5
-    - CSS 2 and 3
+    - CSS3
 
 ## Extra functionality
 
+    - None at this point
     - No JavaScript has been used in this version.
+
+### TODO
+
+    Next iteration, will have some sexy AJAXy stuff for design purposes, as well as client side validation with Javascript.
