@@ -1,18 +1,15 @@
--- MySQL table create
-CREATE TABLE guestbook (
-   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   guest_pass CHAR(41),
-   guest_name CHAR(100),
-   guest_email CHAR(100),
-   guest_message TEXT,
-   date_submitted TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- MySQL
 
--- Sqlite3 table create
--- CREATE TABLE "main"."guestbook" (
---    "id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL,
---    "guest_name" CHAR(50) NOT NULL,
---    "guest_email" CHAR(100) NOT NULL,
---    "guest_message" TEXT NOT NULL,
---    "date_submitted" NOT NULL DEFAULT CURRENT_DATE
---    );
+--
+-- Table structure for table `guestbook`
+--
+
+CREATE TABLE IF NOT EXISTS `guestbook` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `guest_name` varchar(100) NOT NULL,
+  `guest_pass` char(41) NOT NULL,
+  `guest_email` varchar(100) NOT NULL,
+  `guest_message` char(250) NOT NULL,
+  `date_submitted` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
