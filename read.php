@@ -19,7 +19,7 @@
     session_start();    // For paginated results tracking
     require "connect.php";
     require "Pager.class.php";
-    
+
     $page_url = htmlentities($_SERVER['PHP_SELF']); // avoid injection
     $limit = 4; // results per page
     $deleted = '';
@@ -46,9 +46,9 @@
 
     // Delete comment
     if ( isset($option) && $option==='del' && isset($entry_id) )
-        {        
+        {
         $sql = "DELETE FROM guestbook WHERE id = $entry_id";
-        
+
         if ( $dbh->exec($sql) )
             $error_messages[] = "<p>Your comment has been deleted.</p>";
         else
@@ -70,7 +70,7 @@
 </head>
 <body>
     <h2>Simple Guestbook</h2>
-        
+
     <?php
     // Get total records from DB
     if ( !isset($_SESSION['total_records']) )
@@ -138,7 +138,7 @@
                     OFFSET $offset";
 
             print "<h5>{$_SESSION['total_records']} comments in the guestbook</h5>";
-            print "<p id=new><a class='cyan' href='post.php'>New comment</a></p>";
+            print "<p id=new><a class='green' href='post.php'>New comment</a></p>";
 
             // Show deleted comment information, in case user deleted
             if ( count($messages) ) {
@@ -163,7 +163,7 @@
                 $record .= '<p id=date-submit><span>'. $date_submitted .'</span></p>';
                 $record .= sprintf("
                     <div class=edit-del-btns>%s %s</div>",
-                    "<a class='button green' href='post.php?op=edit&entry={$entry['id']}'><span>Edit</span></a>",
+                    "<a class='button cyan' href='post.php?op=edit&entry={$entry['id']}'><span>Edit</span></a>",
                     "<a class='button red' href='read.php?op=del&entry={$entry['id']}'><span>Delete</span></a>"
                 );
                 $record .= "</article>\n";

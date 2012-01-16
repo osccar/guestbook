@@ -22,6 +22,7 @@
     $pepper = 'guestbk';
     $salt = '%';
     $feedback_info = '';
+    $maxchars = 250;
     $error_messages = array();
 
     // Sanitize and filter input vars (GET & POST)
@@ -34,8 +35,8 @@
     if ( @filter_has_var(INPUT_POST, 'GuestEmail') )
         // Use guest's email as his unique identifier
         $guest_id = @filter_input( INPUT_POST, 'GuestEmail', FILTER_SANITIZE_STRING );
-        
-        
+
+
     /**
      * Minimal requirements for all new comments:
      *      - all fields must be filled
@@ -58,10 +59,13 @@
                     $error_messages[] = 'Email address is invalid.';
                     break;
                     }
-            // 150 max. characters for comments
+
+            // Max. characters for comments, add ellipsis to end
             if ( $field === 'GuestMessage' )
-                if ( strlen($value) > 150 )
-                    $_POST['GuestMessage'] = substr($value, 0, 150);
+                if ( strlen($value) > $maxchars ) {
+                    $_POST['GuestMessage'] = substr($value, 0, $maxchars);
+                    $_POST['GuestMessage'] = substr_replace($_POST['GuestMessage'], '...', -4);
+                }
             }
         extract($_POST);
         }
@@ -69,9 +73,9 @@
 
     /**
      * TODO: extra filtering should be added for robustness
-     * 
+     *
      * - for example, limit comments to # characters some other way
-     * 
+     *
      * Add here, below...
      *
      */
@@ -109,17 +113,17 @@
     if ( isset($guest_id) && @$option==='edit' && (count($error_messages) == 0) )
         {
         require 'connect.php';
-        
+
         $GuestPass = addslashes(strip_tags(trim( $_POST['GuestPass'] . $salt . $pepper )));
         $GuestEmail = addslashes(strip_tags(trim( $_POST['GuestEmail'] )));
         $GuestMessage = addslashes(strip_tags(trim( $_POST['GuestMessage'] )));
-        
+
         $select_query = trim("
                         SELECT COUNT(id)
                         FROM guestbook
                         WHERE guest_pass = PASSWORD('$GuestPass') AND guest_email = '$GuestEmail'
         ");
-                        
+
         // Verify password exists
         if ( $stmt = $dbh->query($select_query) )
             {
@@ -193,7 +197,7 @@
             }
         }
     elseif ( count($error_messages) )
-    // Alert errors    
+    // Alert errors
         {
         foreach ( $error_messages as $message )
             print "<div class=feedback-info>$message</div>";
@@ -227,6 +231,6 @@
             </form>
         </div>
     <?php } ?>
-    
+
 </body>
 </html>
