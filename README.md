@@ -25,6 +25,10 @@
     - None at this point
     - No JavaScript has been used in this version.
 
-### TODO
+### Instructions
 
-    Next iteration, will have some sexy AJAXy stuff for design purposes, as well as client side validation with Javascript.
+    - Download all content to a new folder in the publicly accessible folder of the web server (eg: /var/www or /lampp/htdocs)
+    - Create new database or use an existing one and use 'guestbook.sql' to create the table
+    - Edit 'connect.php' and insert correct credentials to access the database
+    - Open 'read.php' and start using
+    - Happy commenting!
