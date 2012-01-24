@@ -5,6 +5,7 @@
      * This file has two purposes:
      *      - read/show comments (using pagination)
      *      - delete a selected comment
+     *      - remove unwanted or foul language in comments
      *
      *  TODO: it has basic input filtering and sanitization but some further filtering should be done
      *      in order to make it much more robust.
@@ -23,9 +24,8 @@
 
     $page_url     = htmlentities($_SERVER['PHP_SELF']); // avoids injection
     $limit        = 5; // results per page
-    $deleted      = '';
     $messages     = array();
-    $unacceptable = array('fuck', 'ass', 'shit');
+    $unacceptable = array('dog', 'idiot', 'stupid');    // Unaccepted word list
 
     // Initialize total records count
     if ( !isset($_SESSION['total_records']) )
