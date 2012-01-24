@@ -25,10 +25,11 @@
     - None at this point
     - No JavaScript has been used in this version.
 
-### Instructions
+---
 
-    - Download all content to a new folder in the publicly accessible folder of the web server (eg: /var/www or /lampp/htdocs)
-    - Create new database or use an existing one and use 'guestbook.sql' to create the table
-    - Edit 'connect.php' and insert correct credentials to access the database
-    - Open 'read.php' and start using
-    - Happy commenting!
+### Instructions
+    1. Download all content to a new folder in the publicly accessible folder of the web server (eg: /var/www or /lampp/htdocs)
+    2. Create new database or use an existing one and use 'guestbook.sql' to create the table
+    3. Edit 'connect.php' and insert correct credentials to access the database
+    4. Open 'read.php' and start using
+    5. Happy commenting!
