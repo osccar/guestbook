@@ -5,7 +5,6 @@
      * This file has two purposes:
      *      - read/show comments (using pagination)
      *      - delete a selected comment
-     *      - remove unwanted or foul language in comments
      *
      *  TODO: it has basic input filtering and sanitization but some further filtering should be done
      *      in order to make it much more robust.
@@ -24,21 +23,9 @@
 
     $page_url     = htmlentities($_SERVER['PHP_SELF']); // avoids injection
     $limit        = 5; // results per page
+    $deleted      = '';
     $messages     = array();
-    $unacceptable = array('dog', 'idiot', 'stupid');    // Unaccepted word list
-
-    // Initialize total records count
-    if ( !isset($_SESSION['total_records']) )
-        {
-        try {
-            $rows = $dbh->query("SELECT COUNT(id) FROM guestbook");
-            $_SESSION['total_records'] = $rows->fetchColumn();
-            }
-        catch (Exception $e)
-            {
-            $_SESSION['total_records'] = 0;
-            }
-        }
+    $unacceptable = array('fuck', 'ass', 'shit');
 
     // Sanitize and filter GET vars
     if ( filter_has_var(INPUT_GET, 'entry') )
@@ -50,12 +37,12 @@
     /**
      * Basic requirements for all comments:
      *
-     *  - all text from comment field must be filtered for unacceptable words before printing! (line 183)
-     *  - others...
+     *  - all text from comment field must be checked for unacceptable words! (line 147)
      *
      * TODO: extra filtering can be added if needed (not required)
      *
      *  - add below...
+     *
      */
 
 
@@ -93,14 +80,19 @@
     <h2>Simple Guestbook</h2>
 
     <?php
-    // Get total records
-    try {
-        $rows = $dbh->query("SELECT COUNT(id) FROM guestbook");
-        $_SESSION['total_records'] = $rows->fetchColumn();
-        }
-    catch (Exception $e)
+
+    // Get total records from DB
+    if ( !isset($_SESSION['total_records']) )
         {
-        $messages[] = "<p>Error. Could not retrieve total count of records.</p>";
+        try {
+            $rows = $dbh->query("SELECT COUNT(id) FROM guestbook");
+            $_SESSION['total_records'] = $rows->fetchColumn();
+            }
+        catch (Exception $e) {
+            $_SESSION['total_records'] = 0;
+            // Empty Guestbook !!
+            $messages[] = "<em>Guestbook seems to be empty! :-( <br>Wouldn't you like to be the first?";
+            }
         }
 
     print "<h5>{$_SESSION['total_records']} comments in the guestbook</h5>";
@@ -112,46 +104,42 @@
         foreach ( $messages as $message )
             print "<div class=feedback-info>$message</div>";
 
-        // print "<p>Return to <a href='read.php'><span>comments</span></a></p>";
+        print "<p>Return to <a href='read.php'><span>comments</span></a></p>";
         }
-    // Empty guestbook feedback
-    elseif ( $_SESSION['total_records'] == 0 )
-        {
-        print "<div class=feedback-info>
-                <p>Guestbook seems to be empty! :-(</p>
-                </div>";
-        }
-    // Show comments
     else
         {
         /** PAGINATION *****************************/
 
         $range_options = array('min' => 1, 'max' => $_SESSION['total_records']);
 
-        // Get page values before setting up new pagination links
-
-        // Check current page number
+        // Check page values before seting up new pagination links
         if ( !filter_has_var(INPUT_GET, 'page') )
+            // Check page number for pagination
             $page = 1;  // no page was set
-        // Check page value within limits
+
         elseif ( !filter_var($_GET['page'], FILTER_VALIDATE_INT, $range_options) )
+            // Check page value within limits
             $page = 1;  // validation was not possible
+
         else
             $page = (int) $_GET['page']; // sets the page
 
+        // Pagination setup
 
+        // Get total records
+        try {
+            $rows = $dbh->query("SELECT COUNT(id) FROM guestbook");
+            $_SESSION['total_records'] = $rows->fetchColumn();
+        } catch (Exception $e) {
+            $messages[] = "Error. Could not retrieve total count of records.";
+        }
 
         $pager  = Pager::getPagerData($_SESSION['total_records'], $limit, $page);
         $offset = $pager->offset;
         $limit  = $pager->limit;
         $page   = $pager->page;
-        $sql = "SELECT id, guest_name, guest_email, guest_message, date_submitted
-                FROM guestbook
-                ORDER BY date_submitted DESC
-                LIMIT $limit
-                OFFSET $offset";
 
-        $pagination = '<ul id=pager>';  // Start pagination structure
+        $pagination = '<ul id=pager>';  // Start pagination
 
         // If first page, no PREVIOUS link required
         if ( $page != 1 )
@@ -170,39 +158,48 @@
         if ( $page < $pager->num_pages )
             $pagination .= '<li><a href=' . $page_url . '?page=' . ($page + 1) . '>&gt;&gt;</a></li>';
 
-        $pagination .= '</ul>'; // Close pagination structure
-
-        /** END pagination setup ****************/
+        $pagination .= '</ul>'; // Close pagination
 
         /** COMMENTS ****************************/
 
-        print "<div id=gb-comments>";
-        foreach ( $stmt = $dbh->query($sql) as $entry )
+        // Show comments, if any
+        if ( $_SESSION['total_records'] )
             {
-            // Remove unacceptable words
-            $guest_message = str_ireplace($unacceptable, "***", $entry['guest_message']);
+            $sql = "SELECT id, guest_name, guest_email, guest_message, date_submitted
+                    FROM guestbook
+                    ORDER BY date_submitted DESC
+                    LIMIT $limit
+                    OFFSET $offset";
 
-            // Format date/time output
-            $date_submitted = date('F j, Y g:i a', strtotime($entry['date_submitted']));
+            print "<div id=gb-comments>";
+            foreach ( $stmt = $dbh->query($sql) as $entry )
+                {
+                // Remove unacceptable words
+                $guest_message = str_ireplace($unacceptable, "***", $entry['guest_message']);
 
-            $record = '<article class="gb-entry gradient">';
-            //$record .= sprintf("<h4><a class=guest-name href='mailto:%s'>%s</a></h4>", $entry['guest_email'], $entry['guest_name']);
-            $record .= sprintf("<p id=guest-name>%s</p>", $entry['guest_name']);
-            $record .= '<p><em>'. $guest_message .'</em></p>';
-            $record .= '<p id=date-submit><span>'. $date_submitted .'</span></p>';
-            $record .= sprintf("
-                <div class=edit-del-btns>%s %s</div>",
-                "<a class='button cyan' href='post.php?op=edit&entry={$entry['id']}'><span>Edit</span></a>",
-                "<a class='button red' href='read.php?op=del&entry={$entry['id']}'><span>Delete</span></a>"
-                );
-            $record .= "</article>\n";
-            print $record;
+                // Format date/time output
+                $date_submitted = date('F j, Y g:i a', strtotime($entry['date_submitted']));
+
+                $record = '<article class="gb-entry gradient">';
+                //$record .= sprintf("<h4><a class=guest-name href='mailto:%s'>%s</a></h4>", $entry['guest_email'], $entry['guest_name']);
+                $record .= sprintf("<p id=guest-name>%s</p>", $entry['guest_name']);
+                $record .= '<p><em>'. $guest_message .'</em></p>';
+                $record .= '<p id=date-submit><span>'. $date_submitted .'</span></p>';
+                $record .= sprintf("
+                    <div class=edit-del-btns>%s %s</div>",
+                    "<a class='button cyan' href='post.php?op=edit&entry={$entry['id']}'><span>Edit</span></a>",
+                    "<a class='button red' href='read.php?op=del&entry={$entry['id']}'><span>Delete</span></a>"
+                    );
+                $record .= "</article>\n";
+                print $record;
+                }
+            print "</div>";
+
+            // Only show pagination in case of minimum number of comments
+            if ( $_SESSION['total_records'] > $limit )
+                print $pagination .'<br>';
+
             }
-        print "</div>";
-
-        // Only show pagination in case of minimum number of comments
-        if ( $_SESSION['total_records'] > $limit )
-            print $pagination .'<br>';
         }
 
     // reset feedback messages

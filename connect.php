@@ -1,7 +1,7 @@
 <?php
-    $DSN_MYSQL = "mysql:dbname=[DATABASE NAME];host=localhost";
-    $dbuser = '[DATABASE USER]';
-    $dbpass = '[DATABASE PASSWORD]';
+    $DSN_MYSQL = "mysql:dbname=test;host=localhost";
+    $dbuser = 'osccar';
+    $dbpass = 'AdminSQL';
 
     try {
         $dbh = new PDO($DSN_MYSQL, $dbuser, $dbpass);

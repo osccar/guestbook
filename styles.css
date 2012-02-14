@@ -1,0 +1,219 @@
+/* Basic styles
+  -----------------------------*/
+* { padding: 0; margin: 0 }
+html { overflow: auto; background: rgb(241, 242, 239); height: 100% }
+body {
+    min-height: 100%;
+    width: 640px;
+    margin: 20px auto; /* centered */
+    background-color: rgb(235, 236, 232);
+    border: 1px solid rgb(153, 178, 155);
+    border-width: 3px 1px;
+    /*overflow: auto;*/
+}
+h2, h5, h4 { text-align: center; padding: 3px 0; }
+h2 { font-size: 30px; margin: 10px 0 0 0; color: rgb(82, 86, 74); }
+a, a:link, a:visited { color: rgb(131, 137, 121); text-decoration: none }
+a:active, a:hover { text-decoration: overline }
+li { display:inline; }
+p { text-align: center; }
+
+
+/* FORM
+  ------------------------------*/
+
+#comments-form {
+    position: relative;
+    margin: 20px auto;
+    width: 560px;
+    background-color: rgb(219, 219, 214);
+}
+
+#comments-form form {
+    border: 2px solid rgb(195, 196, 192);
+    padding: 15px 0 15px 25px;
+}
+
+#comments-form form p {
+    color: rgb(82, 86, 74);
+    padding: 3px 0;
+    margin: 0;
+    font-weight: bold;
+    text-align: left;
+}
+
+#comments-form form p input {
+    padding: 3px 2px;
+    margin: 0 0 10px 0;
+    border: 1px solid inset
+}
+
+#comments-form form p input:required {
+    background-color: rgb(252, 252, 227);
+}
+
+#comments-form form p input:not(:focus):invalid {
+    color: rgb(255, 0, 0);
+}
+
+#comments-focus form p input:focus {
+    border: 5px solid rgb(255, 84, 0);
+    background-color: rgba(255, 255, 255, 1);
+}
+
+#comments-form form textarea {
+    padding: 3px 2px;
+    background-color: rgb(252, 252, 227);
+}
+
+.feedback-info {
+    position: relative;
+    margin: 20px auto;
+    background-color: rgb(219, 219, 214);
+    border: 2px solid rgb(195, 196, 192);
+    color: rgb(158, 158, 158);
+    text-align: center;
+    width: 560px;
+    padding: 3px 0;
+}
+
+
+/* COMMENTS
+  -------------------------------*/
+
+#gb-comments {
+    position: relative;
+    margin: 20px auto;
+    width: 560px;
+}
+
+.gb-entry {
+    background-color: rgb(219, 219, 214);
+    margin: 15px auto;
+    padding: 5px 20px 10px;
+    border-top: 8px solid rgb(195, 196, 192);
+}
+
+.gb-entry h4 {
+    padding: 5px 0;
+    font-size: 17px;
+    text-align: left
+}
+
+.gb-entry #guest-name {
+    font-size: 1.25em;
+    color: rgb(131, 137, 121);
+    font-weight: bold
+}
+
+.gb-entry p {
+    font-size: 14px;
+    padding: 5px 0;
+    margin: 5px 0;
+    text-align: left;
+    color: rgb(126, 140, 102);
+}
+
+#date-submit span {
+    padding: 5px 0 0 0;
+    margin: 0;
+    font-size: small;
+    color: rgb(165, 165, 165);
+
+    border-bottom: 1px dotted rgb(165, 165, 165);
+}
+
+
+/* PAGINATION
+  ------------------------------*/
+
+#pager {
+    margin: 0 auto;
+    padding: 5px 0;
+    list-style-type: none;
+    text-align: center
+}
+
+#pager li a {
+    display: inline-block;
+}
+
+#pager li a:hover {
+    text-decoration: none;
+}
+
+#pager li {
+    padding: 3px 5px;
+    margin: 2px;
+    border: 1px solid rgba(141, 147, 137, 0.3);
+}
+
+#pager li:hover {
+    background-color: rgb(179, 191, 172);
+}
+
+li.selected {
+    text-decoration: none;
+    color: rgb(141, 147, 137);
+    font-weight: bold;
+    background-color: rgb(179, 191, 172);
+    border: 1px solid rgb(141, 147, 137);
+}
+
+
+/* BUTTONS
+  -------------------------------*/
+
+body > div {
+    text-align: center;
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+
+.edit-del-btns {
+    text-align: right;
+    padding-top: 4px;
+    letter-spacing: 1px;
+    opacity: 0.8
+}
+
+.edit-del-btns .button {
+    margin: 0 5px;
+}
+
+.edit-del-btns .button::before {
+    content: '[ ';
+}
+
+.edit-del-btns .button::after {
+    content: ' ]';
+}
+
+.edit-del-btns .cyan:hover {
+    color: rgb(70, 199, 199);
+    border-bottom: 1px solid rgb(70, 199, 199);
+}
+
+.edit-del-btns .red:hover {
+    color: rgb(234, 89, 89);
+    border-bottom: 1px solid rgb(234, 89, 89);
+}
+
+p#new {
+    margin: 10px 0 0;
+}
+
+p#new a.green {
+    letter-spacing: 1px;
+}
+
+p#new a.green:hover {
+    color: rgb(154, 173, 93);
+    border-bottom: 1px solid rgb(154, 173, 93);
+    letter-spacing: 1px;
+}
+
+form input[type=submit].button {
+    padding: 4px;
+    color: rgb(82, 86, 74);
+}

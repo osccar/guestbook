@@ -23,7 +23,6 @@
     $salt = '%';
     $feedback_info = '';
     $maxchars = 250;
-    $minchars = 5;
     $error_messages = array();
 
     // Sanitize and filter input vars (GET & POST)
@@ -51,7 +50,7 @@
             if ( isset($field) && strlen(trim($value)) < 1 )
                 {
                 $error_messages[] = 'Please fill in all fields.';
-                break;  // no need to continue checking!!
+                break;
                 }
             // Minimal email validation
             if ( $field === 'GuestEmail' )
@@ -61,13 +60,7 @@
                     break;
                     }
 
-            // Min. characters for comments
-            if ( $field === 'GuestMessage' )
-                if ( strlen($value) < $minchars ) {
-                    $error_messages[] = "A minimum of $minchars characters are required for a comment. Thank you.";
-                }
-
-            // Max. characters for comments, add ellipsis (...) to end
+            // Max. characters for comments, add ellipsis to end
             if ( $field === 'GuestMessage' )
                 if ( strlen($value) > $maxchars ) {
                     $_POST['GuestMessage'] = substr($value, 0, $maxchars);
@@ -92,71 +85,65 @@
     /** PROCESS COMMENTS ***********************************/
 
     // Insert new comment to DB
-    // if ( !isset($option) && !empty($GuestName) && !empty($GuestPass) && !empty($GuestEmail) && !empty($GuestMessage) )
-
-    if ( count($error_messages) == 0 )
+    if ( !isset($option) && !empty($GuestName) && !empty($GuestPass) && !empty($GuestEmail) && !empty($GuestMessage) )
         {
-        if ( !isset($option) && !empty($GuestName) && !empty($GuestPass) && !empty($GuestEmail) && !empty($GuestMessage) )
+        require "connect.php";
+
+        // Clean input
+        $GuestName = addslashes(strip_tags(trim( $_POST['GuestName'] )));
+        $GuestPass = addslashes(strip_tags(trim( $_POST['GuestPass'] . $salt . $pepper )));
+        $GuestEmail = addslashes(strip_tags(trim( $_POST['GuestEmail'] )));
+        $GuestMessage = addslashes(strip_tags(trim( $_POST['GuestMessage'] )));
+
+        $sql = "INSERT INTO guestbook (guest_name, guest_pass, guest_email, guest_message)
+                VALUES ('$GuestName', PASSWORD('$GuestPass') ,'$GuestEmail', '$GuestMessage')";
+
+        // Insert comment or bust!
+        if ( $stmt = $dbh->query($sql) )
+            $feedback_info = "Thanks for leaving a comment. View messages <a href='read.php'>here</a>.";
+        else
+            $feedback_info = "Sorry but your comment couldn't be added. Please try again.";
+
+        unset($_POST);
+        unset($dbh);
+        }
+
+
+    // Insert edited comment into DB
+    if ( isset($guest_id) && @$option==='edit' && (count($error_messages) == 0) )
+        {
+        require 'connect.php';
+
+        $GuestPass = addslashes(strip_tags(trim( $_POST['GuestPass'] . $salt . $pepper )));
+        $GuestEmail = addslashes(strip_tags(trim( $_POST['GuestEmail'] )));
+        $GuestMessage = addslashes(strip_tags(trim( $_POST['GuestMessage'] )));
+
+        $select_query = trim("
+                        SELECT COUNT(id)
+                        FROM guestbook
+                        WHERE guest_pass = PASSWORD('$GuestPass') AND guest_email = '$GuestEmail'
+        ");
+
+        // Verify password exists
+        if ( $stmt = $dbh->query($select_query) )
             {
-            require "connect.php";
-
-            // Clean input
-            $GuestName = addslashes(strip_tags(trim( $_POST['GuestName'] )));
-            $GuestPass = addslashes(strip_tags(trim( $_POST['GuestPass'] . $salt . $pepper )));
-            $GuestEmail = addslashes(strip_tags(trim( $_POST['GuestEmail'] )));
-            $GuestMessage = addslashes(strip_tags(trim( $_POST['GuestMessage'] )));
-
-            $sql = "INSERT INTO guestbook (guest_name, guest_pass, guest_email, guest_message)
-                    VALUES ('$GuestName', PASSWORD('$GuestPass') ,'$GuestEmail', '$GuestMessage')";
-
-            // Insert comment or bust!
-            if ( $stmt = $dbh->query($sql) )
-                $feedback_info = "Thanks for leaving a comment. View messages <a href='read.php'>here</a>.";
-            else
-                $feedback_info = "Sorry but your comment couldn't be added. Please try again.";
-
-            unset($_POST);
-            unset($dbh);
-            }
-
-
-        // Insert edited comment into DB
-        if ( isset($guest_id) && @$option == 'edit' )
-            {
-            require 'connect.php';
-
-            // Filtering and sanitization
-            $GuestPass = addslashes(strip_tags(trim( $_POST['GuestPass'] . $salt . $pepper )));
-            $GuestEmail = addslashes(strip_tags(trim( $_POST['GuestEmail'] )));
-            $GuestMessage = addslashes(strip_tags(trim( $_POST['GuestMessage'] )));
-
-            $select_query = trim("
-                            SELECT COUNT(id)
-                            FROM guestbook
-                            WHERE guest_pass = PASSWORD('$GuestPass') AND guest_email = '$GuestEmail'
-            ");
-
-            // Verify password exists
-            if ( $stmt = $dbh->query($select_query) )
+            if ( $stmt->fetchColumn() )
                 {
-                if ( $stmt->fetchColumn() )
-                    {
-                    $update_query = trim("
-                            UPDATE guestbook
-                            SET guest_message = '$GuestMessage', date_submitted = CURRENT_TIMESTAMP
-                            WHERE guest_email = '$guest_id'
-                    ");
+                $update_query = trim("
+                        UPDATE guestbook
+                        SET guest_message = '$GuestMessage', date_submitted = CURRENT_TIMESTAMP
+                        WHERE guest_email = '$guest_id'
+                ");
 
-                    if ( $dbh->exec($update_query) )
-                        $feedback_info = "<p>Your comment has been successfully updated. View all messages <a href='read.php'>here</a>.</p>";
-                    else
-                        $feedback_info = "<p>Sorry! Your comment couldn't be edited. Please try again.</p>";
-                    }
+                if ( $dbh->exec($update_query) )
+                    $feedback_info = "<p>Your comment has been successfully updated. View all messages <a href='read.php'>here</a>.</p>";
                 else
-                    $error_messages[] = "Invalid password!!";
+                    $feedback_info = "<p>Sorry! Your comment couldn't be edited. Please try again.</p>";
                 }
-            unset($dbh);
+            else
+                $error_messages[] = "Invalid password!!";
             }
+        unset($dbh);
         }
 ?>
 
