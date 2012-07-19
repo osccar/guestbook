@@ -12,4 +12,4 @@ CREATE TABLE IF NOT EXISTS `guestbook` (
   `guest_message` char(250) NOT NULL,
   `date_submitted` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
