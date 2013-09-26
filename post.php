@@ -18,7 +18,7 @@
     ini_set('display_errors', TRUE); // set to 'FALSE' for production
     // #############################
 
-    $unacceptable = array('fuck', 'ass', 'shit', 'suck');
+    $unacceptable = array('enter', 'desired', 'unacceptable', 'words', 'here');
     $pepper = 'guestbk';
     $salt = '%';
     $feedback_info = '';
@@ -100,9 +100,9 @@
 
         // Insert comment or bust!
         if ( $stmt = $dbh->query($sql) )
-            $feedback_info = "Thanks for leaving a comment. View messages <a href='read.php'>here</a>.";
+            $feedback_info = "<span class='ok'>Thank you for leaving a comment.</span> View messages <a href='read.php'>here</a>.";
         else
-            $feedback_info = "Sorry but your comment couldn't be added. Please try again.";
+            $feedback_info = "<span class='nok'>Sorry but your comment couldn't be added.</span> Please try again.";
 
         unset($_POST);
         unset($dbh);
@@ -136,12 +136,12 @@
                 ");
 
                 if ( $dbh->exec($update_query) )
-                    $feedback_info = "<p>Your comment has been successfully updated. View all messages <a href='read.php'>here</a>.</p>";
+                    $feedback_info = "<p><span class='ok'>Your comment has been successfully updated.</span> View all messages <a href='read.php'>here</a>.</p>";
                 else
-                    $feedback_info = "<p>Sorry! Your comment couldn't be edited. Please try again.</p>";
+                    $feedback_info = "<p><span class='nok'>Sorry! Your comment couldn't be edited.</span> Please try again.</p>";
                 }
             else
-                $error_messages[] = "Invalid password!!";
+                $error_messages[] = "<span class='nok'>Invalid password.</span>";
             }
         unset($dbh);
         }
@@ -155,7 +155,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Comment wisely</h2>
+    <h2>Comment wisely!</h2>
     <br>
     <?php
     // Edit previous comment
@@ -170,10 +170,10 @@
 
             $stmt = $dbh->query($sql);
             $entry = $stmt->fetchAll();
-            $date_submitted = date("F j, Y g:i a", strtotime($entry[0]['date_submitted']));
+            $date_submitted = date("g:i a -- F j, Y", strtotime($entry[0]['date_submitted']));
             print "<div id=comments-form>
                     <form method=post action=post.php?op=edit>
-                        <p>Previously submitted on $date_submitted</p>
+                        <p>Previously submitted at $date_submitted</p>
                         <br>
                         <p>Name</p>
                         <p><input disabled type=text name=GuestName value='{$entry[0]['guest_name']}'></p>
@@ -191,18 +191,18 @@
                         <input type=submit class='button medium cyan' value='So let it be RE-written!'>
                     </form>
                     </div>
-                    <br>
-                    <p>Or <a href='read.php'>return</a> to comments...</p>";
+                    <p class='gb-pagination'>Or <a href='read.php'>return</a> to comments...</p>";
             // NOTE: hidden input fields are needed since 'disabled' input form fields are not sent with the form
             }
         }
     // Alert errors
     elseif ( count($error_messages) )
         {
-        foreach ( $error_messages as $message )
-            print "<div class=feedback-info>$message</div>";
-
-        print "<p>Try <a href='read.php'><span>again</span></a></p>";
+        foreach ( $error_messages as $message ) 
+            {
+            print "<div class=feedback-info>$message</div>";            
+            }
+        print "<p class='gb-pagination'>Try <a href='read.php'><span>again</span></a></p>";
         }
     // New comment form
     else

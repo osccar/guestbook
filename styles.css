@@ -3,13 +3,12 @@
 * { padding: 0; margin: 0 }
 html { overflow: auto; background: rgb(241, 242, 239); height: 100% }
 body {
-    min-height: 100%;
+/*    height: 90%;*/
     width: 640px;
     margin: 20px auto; /* centered */
     background-color: rgb(235, 236, 232);
     border: 1px solid rgb(153, 178, 155);
     border-width: 3px 1px;
-    /*overflow: auto;*/
 }
 h2, h5, h4 { text-align: center; padding: 3px 0; }
 h2 { font-size: 30px; margin: 10px 0 0 0; color: rgb(82, 86, 74); }
@@ -82,7 +81,8 @@ p { text-align: center; }
   -------------------------------*/
 
 #gb-comments {
-    position: relative;
+    /* position: relative; */
+    clear: both;
     margin: 20px auto;
     width: 560px;
 }
@@ -119,19 +119,28 @@ p { text-align: center; }
     margin: 0;
     font-size: small;
     color: rgb(165, 165, 165);
-
     border-bottom: 1px dotted rgb(165, 165, 165);
 }
 
+span.ok {
+    color: rgb(51, 102, 51);
+}
+
+span.nok {
+    color: rgb(234, 89, 89);
+}
 
 /* PAGINATION
   ------------------------------*/
+
+.gb-pagination {
+    margin: 0 auto 15px;
+}
 
 #pager {
     margin: 0 auto;
     padding: 5px 0;
     list-style-type: none;
-    text-align: center
 }
 
 #pager li a {
@@ -190,8 +199,8 @@ body > div {
 }
 
 .edit-del-btns .cyan:hover {
-    color: rgb(70, 199, 199);
-    border-bottom: 1px solid rgb(70, 199, 199);
+    color: rgb(51, 102, 51);
+    border-bottom: 1px solid rgb(51, 102, 51);
 }
 
 .edit-del-btns .red:hover {
